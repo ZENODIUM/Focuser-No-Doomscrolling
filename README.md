@@ -50,6 +50,21 @@ Reels is recognized from Instagram's own screen names: the Reels tab, or the ree
 
 Closing an app is the same action as pressing Home. Focuser does not press Back. On Instagram, Back from Reels used to dump you on the phone's app drawer.
 
+## What you see, and the Android tool behind it
+
+An accessibility service is a listener you turn on under Settings, Accessibility. Android then lets that app notice another app, read the names of things on its screen, draw over it, and press Home. Greyscale is a different tool: the system color filter.
+
+| What you see | The Android tool behind it |
+| --- | --- |
+| The app knows Instagram or YouTube just opened | Accessibility event `typeWindowStateChanged`, then `rootInActiveWindow`. The event fires when the front window changes and names the app in front. |
+| Reels or Shorts closes the app, but the home feed does not | `findAccessibilityNodeInfosByViewId` on the screen tree. That reads the names of buttons and panels, such as the Reels tab or the Shorts player. It does not log in or read your messages. |
+| The app is sent home | `performGlobalAction(GLOBAL_ACTION_HOME)`. That is the same action as pressing the Home button. It does not press Back. |
+| The black pause screen | Window type `TYPE_ACCESSIBILITY_OVERLAY`. The service draws its own full screen window on top of the app you just opened. That window is not a page inside Instagram. |
+| The minute count | A timer in the service, plus `PowerManager.isInteractive`. Time is added only while one of those apps is on screen and the screen is on. |
+| The screen goes grey on Instagram or YouTube | `Settings.Secure` keys `accessibility_display_daltonizer` (mode 0) and `accessibility_display_daltonizer_enabled`. This is Android color correction. The write needs `WRITE_SECURE_SETTINGS`, granted once from a computer. |
+| Today's minutes stay until midnight | `SharedPreferences`. Private storage for this app. The date is stored with the totals, and a new minute number waits until the next day. |
+| Other apps are left alone | `packageNames` on the service. Android only sends events for the packages listed there. |
+
 ## What the research actually tested
 
 These papers were opened and checked before they were listed here. The app follows the shape of the results. It is not a copy of any study, and none of these trials was run on Focuser.
@@ -89,3 +104,25 @@ adb shell pm grant com.vizeno.focuser android.permission.WRITE_SECURE_SETTINGS
 ```
 
 Open Focuser again after that. The greyscale row should stop asking for setup. You can turn wireless debugging off. The permission stays until the app is uninstalled.
+
+## Prompt to build this app
+
+You need Android Studio, Kotlin, and Jetpack Compose. The phone should be Android 8 or newer. Turn the finished app on under Settings, Accessibility. Grey also needs this once from a computer: `adb shell pm grant com.vizeno.focuser android.permission.WRITE_SECURE_SETTINGS`.
+
+Copy the block below to a coding agent.
+
+```text
+Build a personal Android app named Focuser in Kotlin and Jetpack Compose. Simple black and white switches. No accounts, no AI, no usage dashboard. For each row, use the Android tool in the second column and no other approach.
+
+What you see | The Android tool behind it
+The app knows Instagram or YouTube just opened | Accessibility event typeWindowStateChanged, then rootInActiveWindow. The event fires when the front window changes and names the app in front.
+Reels or Shorts closes the app, but the home feed does not | findAccessibilityNodeInfosByViewId on the screen tree. That reads the names of buttons and panels, such as the Reels tab or the Shorts player. It does not log in or read messages.
+The app is sent home | performGlobalAction(GLOBAL_ACTION_HOME). Same action as the Home button. Do not press Back.
+The black pause screen | Window type TYPE_ACCESSIBILITY_OVERLAY. Draw a full screen window on top of the app that just opened. It is not a page inside that app.
+The minute count | A timer in the service, plus PowerManager.isInteractive. Add time only while a watched app is on screen and the screen is on.
+The screen goes grey on Instagram or YouTube | Settings.Secure keys accessibility_display_daltonizer (mode 0) and accessibility_display_daltonizer_enabled. This is Android color correction. The write needs WRITE_SECURE_SETTINGS.
+Today's minutes stay until midnight | SharedPreferences. Store the date with the totals. A new minute number waits until the next day.
+Other apps are left alone | packageNames on the accessibility service. Android only sends events for the packages listed there.
+
+Switches: greyscale, daily minutes, block Instagram, block Reels, block YouTube, block Shorts. Reels and Shorts default on. The others default off. Instagram, YouTube, and TikTok open onto a black screen: pick 5, 10, 15, or 30 minutes, wait 6 seconds, then Close or Continue. Extending holds Continue for 2 seconds. Whole app switches skip that screen and go home immediately. One minute number, separate daily clocks for Instagram, YouTube, TikTok, and browsers. TikTok package names share one clock. Browsers share one clock. Time adds up until local midnight. Closing and reopening does not reset it. There is no skip for today.
+```
