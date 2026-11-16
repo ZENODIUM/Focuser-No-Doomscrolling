@@ -1,0 +1,5 @@
+<resources>
+    <string name="app_name">Focuser</string>
+    <string name="accessibility_service_label">Focuser</string>
+    <string name="accessibility_description">Closes Instagram, YouTube, or TikTok when a switch or the daily limit says so, asks before those apps open, and can turn Instagram and YouTube grey. It also counts browser time toward the daily limit.</string>
+</resources>

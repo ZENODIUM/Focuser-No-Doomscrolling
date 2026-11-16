@@ -1,0 +1,40 @@
+# Built output
+*.apk
+*.ap_
+*.aab
+*.dex
+build/
+.gradle/
+.kotlin/
+
+# Local machine paths and secrets
+local.properties
+*.jks
+*.keystore
+keystore.properties
+*.pem
+*.p12
+.env
+.env.*
+google-services.json
+secrets.properties
+
+# IDE and editor
+.idea/
+*.iml
+.cursor/
+.vscode/
+*.swp
+
+# Working notes, not the app
+research_notes/
+reports/
+captures/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Native build leftovers
+.externalNativeBuild/
+.cxx/
